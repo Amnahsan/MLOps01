@@ -28,11 +28,15 @@ pipeline {
       }
     }
 
-    stage('Build Docker') {
+   stage('Build Docker') {
   steps {
-    bat "docker build -t %DOCKERHUB_REPO%:%BUILD_NUMBER% -f MLOps01/Dockerfile ./MLOps01"
+    bat '''
+      echo Building Docker image...
+      docker build -t %DOCKERHUB_REPO%:%BUILD_NUMBER% -f "%WORKSPACE%\\MLOps01\\Dockerfile" "%WORKSPACE%\\MLOps01"
+    '''
   }
 }
+
 
 
     stage('Push Docker') {
