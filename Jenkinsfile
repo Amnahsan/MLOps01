@@ -10,6 +10,17 @@ pipeline {
       steps { checkout scm }
     }
 
+    stage('Debug Workspace') {
+      steps {
+        bat '''
+          echo ==== Current Directory ====
+          cd
+          echo ==== List Files ====
+          dir
+        '''
+      }
+    }
+
     stage('Setup Python') {
       steps {
         bat '''
@@ -21,23 +32,15 @@ pipeline {
 
     stage('Unit Tests') {
       steps {
-        bat '''
-          pytest -q
-          if %ERRORLEVEL% NEQ 0 exit 0
-        '''
+        bat 'pytest -q || exit 0'
       }
     }
 
-   stage('Build Docker') {
-  steps {
-    bat '''
-      echo Building Docker image...
-      docker build -t %DOCKERHUB_REPO%:%BUILD_NUMBER% -f "%WORKSPACE%\\MLOps01\\Dockerfile" "%WORKSPACE%\\MLOps01"
-    '''
-  }
-}
-
-
+    stage('Build Docker') {
+      steps {
+        bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} ."
+      }
+    }
 
     stage('Push Docker') {
       steps {
@@ -52,20 +55,14 @@ pipeline {
 
     stage('Notify Admin') {
       steps {
-        mail bcc: '',
-             body: "Jenkins job %JOB_NAME% #%BUILD_NUMBER% succeeded and pushed image %DOCKERHUB_REPO%:%BUILD_NUMBER%",
-             subject: "Jenkins: Build Succeeded",
-             to: "${ADMIN_EMAIL}"
+        mail bcc: '', body: "Jenkins job ${env.JOB_NAME} #${env.BUILD_NUMBER} succeeded and pushed image ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}", subject: "Jenkins: Build Succeeded", to: "${ADMIN_EMAIL}"
       }
     }
   }
 
   post {
     failure {
-      mail bcc: '',
-           body: "Jenkins job %JOB_NAME% #%BUILD_NUMBER% failed.",
-           subject: "Jenkins: Build Failed",
-           to: "${ADMIN_EMAIL}"
+      mail bcc: '', body: "Jenkins job ${env.JOB_NAME} #${env.BUILD_NUMBER} failed.", subject: "Jenkins: Build Failed", to: "${ADMIN_EMAIL}"
     }
   }
 }
