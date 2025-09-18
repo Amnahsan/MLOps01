@@ -24,7 +24,8 @@ pipeline {
     }
     stage('Build Docker') {
       steps {
-        bat "docker build -t %DOCKERHUB_REPO%:${BUILD_NUMBER} ."
+        bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} ./MLOps01"
+
       }
     }
     stage('Push Docker') {
