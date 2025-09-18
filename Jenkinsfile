@@ -40,11 +40,16 @@ pipeline {
 
 
 
-    stage('Build Docker') {
+   stage('Build Docker') {
   steps {
-    bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} -f MLOps01/Dockerfile ./MLOps01"
+    bat '''
+      echo Building Docker image from nested Dockerfile path
+      docker build -t %DOCKERHUB_REPO%:%BUILD_NUMBER% -f MLOps01_with_CICD\\MLOps01\\Dockerfile . 
+    '''
   }
 }
+
+
 
 
 
