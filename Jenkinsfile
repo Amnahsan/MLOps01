@@ -26,12 +26,19 @@ pipeline {
       }
     }
 
-    stage('Debug Workspace') {
+   stage('Debug Workspace') {
   steps {
-    bat 'dir'
-    bat 'cd MLOps01 && dir'
+    bat '''
+      echo === Current Workspace ===
+      cd
+      echo === Files in workspace root ===
+      dir
+      echo === Files in MLOps01 folder ===
+      dir MLOps01
+    '''
   }
 }
+
 
 
     stage('Build Docker') {
