@@ -1,9 +1,9 @@
 pipeline {
   agent any
   environment {
-    DOCKERHUB_CREDS = credentials('dockerhub-creds') // create in Jenkins credentials
-    DOCKERHUB_REPO = "yourdockerhubusername/your-repo-name"
-    ADMIN_EMAIL = "admin@example.com"
+    DOCKERHUB_CREDS = credentials('dockerhub-credentials') // create in Jenkins credentials
+    DOCKERHUB_REPO = "i228759/mlops1"
+    ADMIN_EMAIL = "amnahsn113@gmail.com"
   }
   stages {
     stage('Checkout') {
@@ -27,7 +27,7 @@ pipeline {
     }
     stage('Push Docker') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
           sh "docker push ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}"
         }
