@@ -10,16 +10,6 @@ pipeline {
       steps { checkout scm }
     }
 
-    stage('Debug Workspace') {
-      steps {
-        bat '''
-          echo ==== Current Directory ====
-          cd
-          echo ==== List Files ====
-          dir
-        '''
-      }
-    }
 
     stage('Setup Python') {
       steps {
@@ -35,6 +25,14 @@ pipeline {
         bat 'pytest -q || exit 0'
       }
     }
+
+    stage('Debug Workspace') {
+  steps {
+    bat 'dir'
+    bat 'cd MLOps01 && dir'
+  }
+}
+
 
     stage('Build Docker') {
   steps {
