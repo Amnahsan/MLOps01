@@ -32,17 +32,11 @@ pipeline {
       echo === Current Path ===
       cd
       echo === List all files and folders in workspace ===
-      dir /s /b
+      dir /s /b | findstr /V "\.git\"
     '''
   }
 }
 
-
-stage('List Files') {
-  steps {
-    bat 'dir /s /b'
-  }
-}
 
 
 
