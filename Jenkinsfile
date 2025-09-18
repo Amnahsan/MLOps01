@@ -1,7 +1,7 @@
 pipeline {
   agent any
   environment {
-    DOCKERHUB_CREDS = credentials('dockerhub-credentials')
+    DOCKERHUB_CREDS = credentials('dockerhub-credentials') 
     DOCKERHUB_REPO = "i228759/mlops1"
     ADMIN_EMAIL = "amnahsn113@gmail.com"
   }
@@ -9,8 +9,6 @@ pipeline {
     stage('Checkout') {
       steps { checkout scm }
     }
-
-
     stage('Setup Python') {
       steps {
         bat '''
@@ -19,42 +17,25 @@ pipeline {
         '''
       }
     }
-
     stage('Unit Tests') {
       steps {
         bat 'pytest -q || exit 0'
       }
     }
-
-  stage('Debug Workspace') {
-  steps {
-    bat '''
-      echo === Current Path ===
-      cd
-      echo === List all files and folders in workspace ===
-      cd MLOps01
-dir /b
-    '''
-  }
-}
-
-
-
-
-
-   stage('Build Docker') {
-  steps {
-    bat '''
-      echo Building Docker image from nested Dockerfile path
-      docker build -t %DOCKERHUB_REPO%:%BUILD_NUMBER% -f MLOps01_with_CICD\\MLOps01\\Dockerfile . 
-    '''
-  }
-}
-
-
-
-
-
+    stage('Debug Workspace') {
+      steps {
+        // Only show top-level files/folders, no recursive .git mess
+        bat 'echo ==== Workspace root ===='
+        bat 'dir /b'
+        bat 'echo ==== Inside MLOps01 folder ===='
+        bat 'cd MLOps01 && dir /b'
+      }
+    }
+    stage('Build Docker') {
+      steps {
+        bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} ./MLOps01"
+      }
+    }
     stage('Push Docker') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -65,14 +46,12 @@ dir /b
         }
       }
     }
-
     stage('Notify Admin') {
       steps {
         mail bcc: '', body: "Jenkins job ${env.JOB_NAME} #${env.BUILD_NUMBER} succeeded and pushed image ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}", subject: "Jenkins: Build Succeeded", to: "${ADMIN_EMAIL}"
       }
     }
   }
-
   post {
     failure {
       mail bcc: '', body: "Jenkins job ${env.JOB_NAME} #${env.BUILD_NUMBER} failed.", subject: "Jenkins: Build Failed", to: "${ADMIN_EMAIL}"
