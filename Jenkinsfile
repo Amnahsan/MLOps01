@@ -11,25 +11,29 @@ pipeline {
     }
     stage('Setup Python') {
       steps {
-        sh 'python -m pip install --upgrade pip'
-        sh 'if [ -f requirements.txt ]; then pip install -r requirements.txt || true; fi'
+        bat '''
+          python -m pip install --upgrade pip
+          if exist requirements.txt pip install -r requirements.txt
+        '''
       }
     }
     stage('Unit Tests') {
       steps {
-        sh 'pytest -q || true'
+        bat 'pytest -q || exit 0'
       }
     }
     stage('Build Docker') {
       steps {
-        sh "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} ."
+        bat "docker build -t %DOCKERHUB_REPO%:${BUILD_NUMBER} ."
       }
     }
     stage('Push Docker') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-          sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-          sh "docker push ${DOCKERHUB_REPO}:${env.BUILD_NUMBER}"
+          bat '''
+            echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+            docker push %DOCKERHUB_REPO%:%BUILD_NUMBER%
+          '''
         }
       }
     }
