@@ -26,18 +26,17 @@ pipeline {
       }
     }
 
-   stage('Debug Workspace') {
+  stage('Debug Workspace') {
   steps {
     bat '''
-      echo === Current Workspace ===
+      echo === Current Path ===
       cd
-      echo === Files in workspace root ===
-      dir
-      echo === Files in MLOps01 folder ===
-      dir MLOps01
+      echo === List all files and folders in workspace ===
+      dir /s /b
     '''
   }
 }
+
 
 
 
