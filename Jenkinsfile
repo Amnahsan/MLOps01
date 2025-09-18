@@ -32,7 +32,8 @@ pipeline {
       echo === Current Path ===
       cd
       echo === List all files and folders in workspace ===
-      dir /s /b | findstr /V "\.git\"
+      cd MLOps01
+dir /b
     '''
   }
 }
