@@ -38,6 +38,13 @@ pipeline {
 }
 
 
+stage('List Files') {
+  steps {
+    bat 'dir /s /b'
+  }
+}
+
+
 
 
    stage('Build Docker') {
