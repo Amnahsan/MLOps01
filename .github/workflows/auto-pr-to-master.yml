@@ -1,0 +1,22 @@
+name: Create PR from test to master
+on:
+  push:
+    branches: [ test ]
+
+permissions:
+  contents: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create pull request to master
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'auto: create PR from test to master after tests passed'
+          title: 'Merge test -> master (auto-created)'
+          body: 'Automated PR created after successful tests on `test` branch.'
+          base: master
+          branch: test
